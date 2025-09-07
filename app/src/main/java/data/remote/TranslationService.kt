@@ -1,5 +1,6 @@
 package data.remote
 
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -11,17 +12,33 @@ object TranslationService {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    private val api = retrofit.create(TranslationApi::class.java)
+    private val translationApi = retrofit.create(TranslationApi::class.java)
 
-    suspend fun translate(text: String, source: String, target: String): String {
+    suspend fun translate1() {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create()).client(
+            OkHttpClient.Builder()
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    println("Request URL: ${request.url}")
+                    println("Request body: ${request.body}")
+                    val response = chain.proceed(request)
+                    println("Response code: ${response.code}")
+                    println("Response body: ${response.body?.string()}")
+                    response
+                }
+                .build()
+        ).build()
+    }
+
+    suspend fun translate(inputText: String, sourceLang: String, targetLang: String): String {
         return try {
-            val response = api.translateText(
-                TranslationRequest(q = text, source = source, target = target)
-            )
-            response.translatedText
+            val request = TranslationRequest(q = inputText, source = sourceLang, target = targetLang)
+            val response = translationApi.translateText(request)
+            response.getText() // Use this instead
         } catch (e: Exception) {
             "Translation failed: ${e.message}"
         }
     }
 }
-
