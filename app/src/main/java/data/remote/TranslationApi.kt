@@ -3,37 +3,21 @@ package data.remote
 import retrofit2.http.Body
 import retrofit2.http.POST
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Query
 
 
 interface TranslationApi {
-    @POST("translate")
-    @Headers("Content-Type: application/json")
-    suspend fun translateText(@Body request: TranslationRequest): TranslationResponse
+    @GET("get")
+    suspend fun translateText(
+        @Query("q") text: String,
+        @Query("langpair") langPair: String
+    ): TranslationResponse
 }
-
-/*
-{
-  "q": "Hello",
-  "source": "en",
-  "target": "es",
-  "format": "text"
-}
- */
-
-data class TranslationRequest(
-    val q: String,
-    val source: String,
-    val target: String,
-    val format: String = "text"
-)
-
 data class TranslationResponse(
-    @SerializedName("translatedText")
-    val translatedText: String? = null,
-
-    @SerializedName("translation")
-    val translation: String? = null
-) {
-    fun getText(): String = translatedText ?: translation ?: "No translation found"
-}
+    val responseData: ResponseData
+)
+data class ResponseData(
+    val translatedText: String
+)

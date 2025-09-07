@@ -5,7 +5,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object TranslationService {
-    private const val BASE_URL = "https://libretranslate.com/"
+//    private const val BASE_URL = "https://api.mymemory.translated.net/"
+private const val BASE_URL = "https://api.mymemory.translated.net/"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -34,9 +35,11 @@ object TranslationService {
 
     suspend fun translate(inputText: String, sourceLang: String, targetLang: String): String {
         return try {
-            val request = TranslationRequest(q = inputText, source = sourceLang, target = targetLang)
-            val response = translationApi.translateText(request)
-            response.getText() // Use this instead
+            val response = translationApi.translateText(
+                text = inputText,
+                langPair = "$sourceLang|$targetLang"
+            )
+            response.responseData.translatedText
         } catch (e: Exception) {
             "Translation failed: ${e.message}"
         }
