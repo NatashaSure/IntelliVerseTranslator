@@ -1,4 +1,4 @@
-package com.example.intelliversetranslator.ui.theme
+package ui.theme
 
 import android.app.Activity
 import android.os.Build
